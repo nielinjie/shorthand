@@ -104,6 +104,10 @@ mapToArray:
 
 ## 如何使用
 
+```shell
+npm i @nielinjie/shorthand
+```
+
 使用方式类似于 -
 
 ```javascript

@@ -3,6 +3,10 @@
   "version": "0.2.0",
   "description": "",
   "main": "dist/index.js",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/nielinjie/shorthand.git"
+  },
   "scripts": {
     "test": "jest"
   },
