@@ -5,19 +5,19 @@ test("normal", () => {
   expect(result).toEqual({ a: { b: "hello" } });
 });
 test("apply to object", () => {
-  const rule = { applyIn: "$.foo", split: "." };
+  const rule = { applyTo: "$.foo", split: "." };
   const obj = { a: 1, foo: { "b.c": "hello" } };
   const result = applyByRule(obj, rule);
   expect(result[0]).toEqual({ a: 1, foo: { b: { c: "hello" } } });
 });
 test("apply to an array's items", () => {
-  const rule = { applyIn: "$.foo[*]", split: "." };
+  const rule = { applyTo: "$.foo[*]", split: "." };
   const obj = { a: 1, foo: [{ "b.c": "hello" }] };
   const result = applyByRule(obj, rule);
   expect(result[0]).toEqual({ a: 1, foo: [{ b: { c: "hello" } }] });
 });
 test("apply to an array's items", () => {
-  const rule = { applyIn: "$.foo[*]", split: "." };
+  const rule = { applyTo: "$.foo[*]", split: "." };
   const obj = { a: 1, foo: [{ "b.c": "hello" }, { "e.f": "world" }] };
   const result = applyByRule(obj, rule);
   expect(result[0]).toEqual({
@@ -26,7 +26,7 @@ test("apply to an array's items", () => {
   });
 });
 test("apply to an array's items", () => {
-  const rule = { applyIn: "$.foo[*]", split: "." };
+  const rule = { applyTo: "$.foo[*]", split: "." };
   const obj = {
     a: 1,
     foo: [{ "b.c": "hello", "e.f": "world" }, { "e.f": "world" }],
@@ -39,11 +39,11 @@ test("apply to an array's items", () => {
 });
 //目前支持lodash的path表示法,split只可以是点.
 test("apply to object, split work", () => {
-  const rule = { applyIn: "foo", split: "-" };
+  const rule = { applyTo: "foo", split: "-" };
   const obj = { a: 1, foo: { "b.c": "hello" } };
   const result = applyByRule(obj, rule);
   expect(result[0]).toEqual({ a: 1, foo: { "b.c": "hello" } });
-  const rule2 = { applyIn: "foo", split: "." };
+  const rule2 = { applyTo: "foo", split: "." };
   const result2 = applyByRule(obj, rule2);
   expect(result2[0]).toEqual({ a: 1, foo: { b: { c: "hello" } } });
   const obj2 = { a: 1, foo: { "b-c": "hello" } };

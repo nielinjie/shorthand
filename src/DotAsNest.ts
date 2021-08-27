@@ -6,7 +6,7 @@ export class DotAsNestRule extends Rule {
   run = (obj: object): [object, Log[]] => {
     return applyByRule(obj, this);
   };
-  constructor(public applyIn: string, public split: string) {super();}
+  constructor(public applyTo: string, public split: string) {super();}
 }
 export function transform(keys: string[], value: object,split:string): object {
   let re = { ...value };
@@ -18,7 +18,7 @@ export function transform(keys: string[], value: object,split:string): object {
   return re;
 }
 export function applyByRule(obj: object, rule: DotAsNestRule): [object, Log[]] {
-  const paths = jp.paths(obj, rule.applyIn);
+  const paths = jp.paths(obj, rule.applyTo);
   let re = obj;
   let logs: Log[] = [];
   paths.forEach((path) => {
@@ -49,7 +49,7 @@ export function applyByRuleForOneNode(
     } else {
       return [
         obj,
-        [warn(`no keys found to apply dot as nest shorting`, rule.applyIn)],
+        [warn(`no keys found to apply dot as nest shorting`, rule.applyTo)],
       ];
     }
   } else {

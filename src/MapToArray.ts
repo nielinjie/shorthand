@@ -7,7 +7,7 @@ export class MapToArrayRule extends Rule {
   run = (obj: object): [object, Log[]] => {
     return applyByRule(obj, this);
   };
-  constructor(public applyIn: string, public keyOfItem: string) {super();}
+  constructor(public applyTo: string, public keyOfItem: string) {super();}
 }
 export function transform(
   valueMap: StringKeyValueMap<any>,
@@ -19,7 +19,7 @@ export function transform(
     .value();
 }
 export function applyByRule(obj: any, rule: MapToArrayRule): [object, Log[]] {
-  const paths = jp.paths(obj, rule.applyIn);
+  const paths = jp.paths(obj, rule.applyTo);
   let re = obj;
   let logs: Log[] = [];
   paths.forEach((path) => {
@@ -43,6 +43,6 @@ export function applyByRuleForOneNode(
     jp.value(newObj, jp.stringify(path), newTarget);
     return [newObj, [info(`${path.toString()} is applied map to array`)]];
   } else {
-    return [obj, [warn("target is not an object", rule.applyIn)]];
+    return [obj, [warn("target is not an object", rule.applyTo)]];
   }
 }

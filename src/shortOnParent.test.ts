@@ -56,7 +56,7 @@ test("simple apply", () => {
     { key: "a", schema: Joi.number(), priority: 1 },
     { key: "b", schema: Joi.string(), priority: 0 },
   ];
-  const rule = { applyIn: "$.foo", childRules: rules };
+  const rule = { applyTo: "$.foo", childRules: rules };
   const obj = { a: 1, foo: [1, "jason"] };
   const re = applyByRule(obj, rule);
   expect(re[0]).toEqual({ a: 1, foo: { a: 1, b: "jason" } });
@@ -66,7 +66,7 @@ test("simple apply in a array", () => {
     { key: "a", schema: Joi.number(), priority: 1 },
     { key: "b", schema: Joi.string(), priority: 0 },
   ];
-  const rule = { applyIn: "$.foo[*]", childRules: rules };
+  const rule = { applyTo: "$.foo[*]", childRules: rules };
   const obj = {
     a: 1,
     foo: [

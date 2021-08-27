@@ -19,10 +19,10 @@ export class ShortOnParentRule extends Rule {
   run = (obj: object): [object, Log[]] => {
     return applyByRule(obj, this);
   };
-  constructor(public applyIn: string, public childRules: ChildRule[]) {super()}
+  constructor(public applyTo: string, public childRules: ChildRule[]) {super()}
 }
 export function applyByRule(obj: any, rule: ShortOnParentRule): [any, Log[]] {
-  const paths = jp.paths(obj, rule.applyIn);
+  const paths = jp.paths(obj, rule.applyTo);
   let re = obj;
   let logs: Log[] = [];
   paths.forEach((path) => {
@@ -47,7 +47,7 @@ export function applyByRuleForOneNode(
     jp.value(newObj, jp.stringify(path), newTarget);
     return [newObj, logs];
   } else {
-    return [value, [warn("short is not array", rule.applyIn)]];
+    return [value, [warn("short is not array", rule.applyTo)]];
   }
 }
 export function transform(

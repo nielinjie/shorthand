@@ -1,6 +1,6 @@
 import { applyByRule, transform } from "./MapToArray";
 test("normalize", () => {
-  const rule = { keyOfItem: "name", applyIn: "target" };
+  const rule = { keyOfItem: "name", applyTo: "target" };
   const re = transform({ b: { text: "hello" }, c: { text: "world" } }, rule);
   expect(re).toEqual([
     { name: "b", text: "hello" },
@@ -8,7 +8,7 @@ test("normalize", () => {
   ]);
 });
 test("applyTo one", () => {
-  const rule = { keyOfItem: "name", applyIn: "$.t" };
+  const rule = { keyOfItem: "name", applyTo: "$.t" };
   const obj = { a: 1, t: { b: { text: "hello" }, c: { text: "world" } } };
   const result = applyByRule(obj, rule);
   expect(result[0]).toEqual({
@@ -20,7 +20,7 @@ test("applyTo one", () => {
   });
 });
 test("applyTo deep", () => {
-  const rule = { keyOfItem: "name", applyIn: "$..t" };
+  const rule = { keyOfItem: "name", applyTo: "$..t" };
   const obj = {
     a: 1,
     foo: { t: { b: { text: "hello" }, c: { text: "world" } } },
@@ -37,7 +37,7 @@ test("applyTo deep", () => {
   });
 });
 test("applyTo deep", () => {
-  const rule = { keyOfItem: "name", applyIn: "$..t" };
+  const rule = { keyOfItem: "name", applyTo: "$..t" };
   const obj = {
     a: 1,
     foo: [{ t: { b: { text: "hello" }, c: { text: "world" } } }],
