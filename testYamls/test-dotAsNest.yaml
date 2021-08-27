@@ -1,0 +1,5 @@
+dotAsNest:
+  first: 
+    bar: 1
+  first.kaka: 2
+  first.hala: bar

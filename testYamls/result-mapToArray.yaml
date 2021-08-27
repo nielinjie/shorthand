@@ -1,0 +1,7 @@
+mapToArray:
+  - name: foo
+    id: 1
+    age: 18
+  - name: bar
+    id: 2
+    age: 25

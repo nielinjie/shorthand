@@ -1,0 +1,5 @@
+people:
+  jason.age: 40
+  jason.married: true
+  jim.age: 30
+  jim.married: false

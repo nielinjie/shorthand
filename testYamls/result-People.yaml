@@ -1,0 +1,7 @@
+people:
+  - name: jason
+    age: 40
+    married: true
+  - name: jim
+    age: 30
+    married: false
