@@ -14,11 +14,16 @@ test.each([
   ["mapToArray", new MapToArrayRule("mapToArray", "name")],
   [
     "shortOnParent",
-    new ShortOnParentRule("shortOnParent", [
-      { key: "name", schema: Joi.string(), priority: 0 },
-      { key: "age", schema: Joi.number(), priority: 1 },
-      { key: "married", schema: Joi.boolean(), priority: 2 },
-    ]),
+    new ShortOnParentRule(
+      "shortOnParent",
+      [
+        { key: "name", schema: Joi.string() },
+        { key: "age", schema: Joi.number() },
+        { key: "married", schema: Joi.boolean() },
+      ],
+      undefined,
+      "_$"
+    ),
   ],
 ])("yaml %s", (a, r) => {
   const [obj, resultO] = useTestAndResult(a);
@@ -29,11 +34,16 @@ test.each([
 test("in one", () => {
   const [obj, resultO] = useTestAndResult("people");
   const r = new MapToArrayRule("people", "name");
-  const r2 = new ShortOnParentRule("$..people[*]", [
-    { key: "name", schema: Joi.string(), priority: 0 },
-    { key: "age", schema: Joi.number(), priority: 1 },
-    { key: "married", schema: Joi.boolean(), priority: 2 },
-  ]);
+  const r2 = new ShortOnParentRule(
+    "$..people[*]",
+    [
+      { key: "name", schema: Joi.string() },
+      { key: "age", schema: Joi.number() },
+      { key: "married", schema: Joi.boolean() },
+    ],
+    undefined,
+    "_$"
+  );
   expect(obj).not.toBeNull;
   const re = r2.add(r).run(obj);
   expect(re[0]).toEqual(resultO);

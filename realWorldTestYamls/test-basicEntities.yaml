@@ -1,0 +1,15 @@
+entities:
+  Clock:
+    properties:
+      time:
+        type: string
+      etag:
+        type: string
+  ClockEvent: 
+    properties: []
+  SetTimeRequest:
+    properties:
+      time:
+        type: string
+        constraints:
+          - required

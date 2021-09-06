@@ -1,0 +1,10 @@
+entities:
+  Clock:
+    properties:
+      time: [string]
+      etag: [string]
+  ClockEvent: 
+    properties: []
+  SetTimeRequest:
+    properties:
+      time: [string]

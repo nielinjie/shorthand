@@ -11,7 +11,7 @@ export function validateAnd(
   if (result.error) {
     return result;
   } else {
-    return b.validate(value);
+    return b.validate(result.value);
   }
 }
 
@@ -19,7 +19,14 @@ export class ShortOnParentRule extends Rule {
   run = (obj: object): [object, Log[]] => {
     return applyByRule(obj, this);
   };
-  constructor(public applyTo: string, public childRules: ChildRule[]) {super()}
+  constructor(
+    public applyTo: string,
+    public childRules: ChildRule[],
+    public split: string | undefined,
+    public valueHolder: string | undefined
+  ) {
+    super();
+  }
 }
 export function applyByRule(obj: any, rule: ShortOnParentRule): [any, Log[]] {
   const paths = jp.paths(obj, rule.applyTo);
@@ -28,7 +35,7 @@ export function applyByRule(obj: any, rule: ShortOnParentRule): [any, Log[]] {
   paths.forEach((path) => {
     //   console.log("path",path)
     //   console.log(re)
-    const forOne = applyByRuleForOneNode(re, path, rule);
+    const forOne = applyByRuleForOneNode(re, path, rule, rule.valueHolder);
     re = forOne[0];
     logs = [...logs, ...forOne[1]];
   });
@@ -37,32 +44,92 @@ export function applyByRule(obj: any, rule: ShortOnParentRule): [any, Log[]] {
 export function applyByRuleForOneNode(
   value: any,
   path: string[],
-  rule: ShortOnParentRule
+  rule: ShortOnParentRule,
+  valueHolder: string | undefined
 ): [any, Log[]] {
   const target = jp.value(value, path);
   if (!target) return [value, []];
+  let toTransform: any = undefined;
+  let useValueHolder = false;
   if (_.isArray(target)) {
-    const [newTarget, logs] = transform(target, rule.childRules, path);
+    toTransform = target;
+  }
+  if (rule.split !== undefined && _.isString(target)) {
+    toTransform = target.split(rule.split).map((x) => x.trim());
+  }
+  if (valueHolder && _(target).has(valueHolder)) {
+    const newTarget = target[valueHolder];
+    useValueHolder = true;
+    if (_.isArray(newTarget)) {
+      toTransform = newTarget;
+    }
+    if (rule.split !== undefined && _.isString(newTarget)) {
+      toTransform = newTarget.split(rule.split).map((x) => x.trim());
+    }
+  }
+  if (toTransform !== undefined) {
+    const [newChildren, logs] = transform(
+      toTransform,
+      rule.childRules,
+      path,
+      target
+    );
+    if(newChildren === target){
+      return [value,logs]
+    }
     const newObj = { ...value };
-    jp.value(newObj, jp.stringify(path), newTarget);
+    let oldValue = _.isPlainObject(target) ? { ...target } : {};
+    if (useValueHolder) oldValue = _(oldValue).omit(valueHolder).value();
+    // console.log(`newObj`, newObj);
+    // console.log(`newChildren`, newChildren);
+    // console.log(`path`, path);
+    // console.log(`oldValue`, oldValue)
+    const newValue = _.merge(oldValue, newChildren);
+    // console.log(`newValue`, newValue);
+    jp.value(newObj, jp.stringify(path), newValue);
+
     return [newObj, logs];
   } else {
-    return [value, [warn("short is not array", rule.applyTo)]];
+    return [
+      value,
+      [warn("short is not array or a space joined string", rule.applyTo)],
+    ];
   }
 }
 export function transform(
   value: any[],
   rules: ChildRule[],
-  nodePath: string[]
+  nodePath: string[],
+  originalValue: any
 ): [any, Log[]] {
-  const results = value.map((v) => forOne(v, rules));
+  const results: [any, string][] = [];
+  let remainRules = [...rules];
+  value.forEach((v, index) => {
+    const result = forOne(v, remainRules);
+    if (result) {
+      results.push(result);
+      remainRules = remainRules.filter((r) => r.key !== result[0]);
+    }
+  });
   let re = {};
   let log: Log[] = [];
+  if (value.length > results.length) {
+    log = [
+      warn("some value pieces doesn't match any rules", nodePath.toString()),
+    ];
+    re = value;
+    return [originalValue, log];
+  }
   for (const result of results) {
     if (result) {
       const [path, va] = result;
       if (_(re).has(path)) {
         //这里是有覆盖。啥也不做？还是加上log？
+        log.push(
+          warn(`${path} is already defined, stop overwriting`, path.toString())
+        );
+        re = value;
+        return [originalValue, log];
       } else {
         re = _(re).set(path, va).value();
         log.push(info(`${path} is set to ${va}`, nodePath.toString()));
@@ -75,8 +142,8 @@ export function forOne(
   value: any,
   rules: ChildRule[]
 ): [string, any] | undefined {
-  const sorted = rules.sort((a, b) => a.priority - b.priority);
-  const match = sorted.find(
+  // const sorted = rules.sort((a, b) => a.priority - b.priority);
+  const match = rules.find(
     (rule) => rule.schema.validate(value).error === undefined
   );
   if (match) {
@@ -89,12 +156,7 @@ export function forOne(
 export interface ChildRule {
   key: string;
   schema: Schema;
-  priority: number;
 }
 export class ChildRule implements ChildRule {
-  constructor(
-    public key: string,
-    public schema: Schema,
-    public priority: number = 0
-  ) {}
+  constructor(public key: string, public schema: Schema) {}
 }

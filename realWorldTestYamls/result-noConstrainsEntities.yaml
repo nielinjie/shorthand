@@ -1,0 +1,13 @@
+entities:
+  - name: Clock
+    properties:
+      - name: time
+        type: string
+      - name: etag
+        type: string
+  - name: ClockEvent
+    properties: []
+  - name: SetTimeRequest
+    properties:
+      - name: time
+        type: string

@@ -7,16 +7,35 @@ export class MapToArrayRule extends Rule {
   run = (obj: object): [object, Log[]] => {
     return applyByRule(obj, this);
   };
-  constructor(public applyTo: string, public keyOfItem: string) {super();}
+  constructor(
+    public applyTo: string,
+    public keyOfItem: string,
+    public valueHolder: string | undefined = undefined
+  ) {
+    super();
+  }
 }
 export function transform(
   valueMap: StringKeyValueMap<any>,
-  rule: MapToArrayRule
-): any[] {
-  return _(valueMap)
-    .keys()
-    .map((key: string) => ({ ...valueMap[key], [rule.keyOfItem]: key }))
-    .value();
+  rule: MapToArrayRule,
+  valueHolder: string | undefined
+): [any[], Log[]] {
+  try {
+    const re = _(valueMap)
+      .keys()
+      .map((key: string) => {
+        const value = valueMap[key];
+        if (_.isPlainObject(value)) {
+          return { ...value, [rule.keyOfItem]: key };
+        } else {
+          return { [rule.keyOfItem]: key, [valueHolder!]: value };
+        }
+      })
+      .value();
+    return [re, []];
+  } catch (err) {
+    return [[], [warn(`MapToArrayRule: ${err}`)]];
+  }
 }
 export function applyByRule(obj: any, rule: MapToArrayRule): [object, Log[]] {
   const paths = jp.paths(obj, rule.applyTo);
@@ -25,7 +44,8 @@ export function applyByRule(obj: any, rule: MapToArrayRule): [object, Log[]] {
   paths.forEach((path) => {
     //   console.log("path",path)
     //   console.log(re)
-    const forOne = applyByRuleForOneNode(re, path, rule);
+    const forOne = applyByRuleForOneNode(re, path, rule, rule.valueHolder);
+
     re = forOne[0];
     logs = [...logs, ...forOne[1]];
   });
@@ -34,15 +54,21 @@ export function applyByRule(obj: any, rule: MapToArrayRule): [object, Log[]] {
 export function applyByRuleForOneNode(
   obj: object,
   path: string[],
-  rule: MapToArrayRule
+  rule: MapToArrayRule,
+  valueHolder: string | undefined
 ): [object, Log[]] {
   const target = jp.value(obj, path);
-  if (target && _.isObject(target)) {
-    const newTarget = transform(target, rule);
+  if (target && _.isPlainObject(target)) {
+    // console.log(target);
+    // console.log(_.isObject(target))
+    const [newTarget, logs] = transform(target, rule, valueHolder);
     const newObj = { ...obj };
+    if (logs.length > 0) {
+      return [obj, logs];
+    }
     jp.value(newObj, jp.stringify(path), newTarget);
     return [newObj, [info(`${path.toString()} is applied map to array`)]];
   } else {
-    return [obj, [warn("target is not an object", rule.applyTo)]];
+    return [obj, [warn("target is not an object", path.toString())]];
   }
 }

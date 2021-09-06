@@ -1,0 +1,9 @@
+people:
+  - name: jason
+    age: 40
+    married: true
+    like: football
+  - name: jim
+    age: 30
+    married: false
+    unlike: running

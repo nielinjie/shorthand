@@ -1,3 +1,5 @@
 people:
   jason: [40, true]
+  jason.like: football
   jim: [30, false]
+  jim.unlike: running

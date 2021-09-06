@@ -29,3 +29,8 @@ export abstract class Rule implements Rule {
     return new R();
   }
 }
+
+export function chain(...rules:Rule[]):Rule{
+  const [head,...rest] = rules
+  return rest.reduce((a,b)=>a.add(b),head);
+}
