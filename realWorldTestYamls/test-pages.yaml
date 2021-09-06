@@ -1,0 +1,9 @@
+pages:
+  functionMasterDetail:
+    menuPath: Function/All
+    layout.grid: 2
+    places:
+      FunctionList:
+        presentation: default
+      FunctionDetail:
+        presentation: default

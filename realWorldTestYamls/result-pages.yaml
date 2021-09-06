@@ -1,0 +1,10 @@
+pages:
+  - name: functionMasterDetail
+    menuPath: Function/All
+    layout:
+      grid: 2
+    places:
+      - function: FunctionList
+        presentation: default
+      - function: FunctionDetail
+        presentation: default
