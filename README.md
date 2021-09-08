@@ -130,7 +130,7 @@ mapToArray:
 改写规则如下：
 
 ```javascript
-{ applyTo: "mapToArray", keyOfItem: "name" , valueHolder: "_$"}
+{ applyTo: "mapToArray", keyPropertyName: "name" , valueHolder: "_$"}
 ```
 
 ## 如何使用

@@ -1,0 +1,7 @@
+presentations:
+  - name: withUrl
+    propertyRules:
+      - property: time
+        rules: [fullWidth]
+      - property: id
+        rules: [hidden]
