@@ -9,8 +9,9 @@ export class MapToArrayRule extends Rule {
   };
   constructor(
     public applyTo: string,
-    public keyOfItem: string,
-    public valueHolder: string | undefined = undefined
+    public keyPropertyName: string,
+    public indexPropertyName: string | undefined = undefined,
+    public valueHolder: string | undefined = "_$"
   ) {
     super();
   }
@@ -23,12 +24,24 @@ export function transform(
   try {
     const re = _(valueMap)
       .keys()
-      .map((key: string) => {
+      .map((key: string, index: number) => {
         const value = valueMap[key];
         if (_.isPlainObject(value)) {
-          return { ...value, [rule.keyOfItem]: key };
+          return {
+            ...value,
+            [rule.keyPropertyName]: key,
+            ...(rule.indexPropertyName
+              ? { [rule.indexPropertyName]: index }
+              : {}),
+          };
         } else {
-          return { [rule.keyOfItem]: key, [valueHolder!]: value };
+          return {
+            [rule.keyPropertyName]: key,
+            ...(rule.indexPropertyName
+              ? { [rule.indexPropertyName]: index }
+              : {}),
+            [valueHolder!]: value,
+          };
         }
       })
       .value();

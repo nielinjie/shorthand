@@ -22,8 +22,8 @@ export class ShortOnParentRule extends Rule {
   constructor(
     public applyTo: string,
     public childRules: ChildRule[],
-    public split: string | undefined,
-    public valueHolder: string | undefined
+    public split: string | undefined = ',',
+    public valueHolder: string | undefined = '_$'
   ) {
     super();
   }

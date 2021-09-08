@@ -9,7 +9,7 @@ export class DotAsNestRule extends Rule {
   constructor(
     public applyTo: string,
     public split: string,
-    public valueHolder: string | undefined = undefined
+    public valueHolder: string | undefined = '_$'
   ) {
     super();
   }

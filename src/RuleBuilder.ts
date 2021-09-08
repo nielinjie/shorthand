@@ -7,8 +7,8 @@ export function applyTo(path: string) {
 export class RuleBuilder {
   operation: string | undefined = undefined;
   wrapped: Rule | undefined = undefined;
-  mapToArray(keyOfItem: string = "name") {
-    const ru = new MapToArrayRule(this.applyIn, keyOfItem);
+  mapToArray(keyPropertyName: string = "name") {
+    const ru = new MapToArrayRule(this.applyIn, keyPropertyName);
     this.withOperation(ru);
     return this;
   }
