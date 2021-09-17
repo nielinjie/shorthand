@@ -11,3 +11,7 @@ entities:
     properties:
       - name: time
         type: string
+      - name: relationShip
+        relation:
+          n: one
+          to: bar

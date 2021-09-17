@@ -13,3 +13,8 @@ entities:
         type: string
         constraints:
           - required
+      relationShip:
+        relation:
+          n: one
+          to: bar
+          

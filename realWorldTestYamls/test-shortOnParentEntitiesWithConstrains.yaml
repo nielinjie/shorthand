@@ -9,3 +9,7 @@ entities:
     properties:
       time: [string]
       time.constraints: [required]
+      relationShip:
+        relation:
+          n: one
+          to: bar

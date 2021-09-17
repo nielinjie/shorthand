@@ -1,5 +1,6 @@
 import Joi from "joi";
 import { validateAnd } from "./ShortOnParent";
+import yaml from "js-yaml";
 
 test("schema", () => {
   const s = Joi.object({ a: Joi.string() });
@@ -42,5 +43,30 @@ test("schema add rule on same key", () => {
       message: '"b" is required',
     })
   );
-  s.$_getRule
+  s.$_getRule;
 });
+
+test("describe", () => {
+  const s = Joi.object({ a: Joi.string().required(), b: Joi.string() });
+  const de = s.describe();
+  expect(de).toBeDefined();
+  const string = {
+    type: "object",
+    keys: {
+      a: { type: "string", flags: { presence: "required" } },
+      b: { type: "string" },
+    },
+  };
+  const s2 = Joi.build(de);
+  const v = { a: "hello" };
+  const r = s2.validate(v);
+  expect(r.error).toBeUndefined();
+  const s3 = Joi.build(string);
+  const r2 = s3.validate(v);
+  expect(r2.error).toBeUndefined();
+});
+
+
+function dump(obj) {
+  console.log(yaml.dump(obj));
+}

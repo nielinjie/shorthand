@@ -21,27 +21,27 @@ export function transform(
   valueHolder: string | undefined
 ): [object, Log[]] {
   let re = { ...value };
+  //console.log('value :>> ', value);
   let logs: Log[] = [];
   keys.forEach((key) => {
     const partPath = findMaxMatchPath(re, key.split(split));
+    //console.log('partPath :>> ', partPath);
     const existedValue = _.clone(_(re).get(partPath));
+    //console.log('existedValue :>> ', existedValue);
     if (partPath !== undefined && !_.isPlainObject(existedValue)) {
       if (valueHolder) {
         const v = re[key];
-        // console.log(re)
         re = _(re).omit(key).value();
-        // console.log(re);
-        // console.log(`[...partPath,valueHolder]`, [...partPath, valueHolder]);
         if (_.isArray(existedValue)) {
-          re = {};
+          re = _(re)
+          .set(partPath,{}).value()
         }
         re = _(re)
           .set([...partPath, valueHolder], existedValue)
           .value();
-        // console.log(re);
-
+        //console.log('re :>> ', re);
         re = _(re).set(key.split(split), v).value();
-        // console.log(re);
+        //console.log("re :>> ", re);
       } else {
         logs.push(
           warn(
@@ -77,6 +77,7 @@ export function applyByRuleForOneNode(
   const target = jp.value(obj, path);
   if (target && _.isObject(target)) {
     const keys = _.keys(target).filter((key) => key.indexOf(rule.split) > -1);
+    //console.log('keys :>> ', keys);
     if (keys.length > 0) {
       const [newTarget, logs] = transform(
         keys,
@@ -88,7 +89,9 @@ export function applyByRuleForOneNode(
         return [obj, logs];
       }
       const newObj = { ...obj };
+
       jp.value(newObj, jp.stringify(path), newTarget);
+      //console.log('newTarget :>> ', newTarget);
       return [
         newObj,
         [info(`applied dot as nest shorting - keys=${keys}`, path.toString())],

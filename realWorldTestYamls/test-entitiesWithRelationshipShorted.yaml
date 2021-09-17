@@ -7,8 +7,5 @@ entities:
     properties: []
   SetTimeRequest:
     properties:
-      time: [string]
-      relationShip:
-        relation:
-          n: one
-          to: bar
+      time: [string,[required]]
+      relationShip: [[one,bar]]

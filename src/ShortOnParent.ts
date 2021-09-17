@@ -105,7 +105,7 @@ export function transform(
   const results: [any, string][] = [];
   let remainRules = [...rules];
   value.forEach((v, index) => {
-    const result = forOne(v, remainRules);
+    const result = forOneValue(v, remainRules);
     if (result) {
       results.push(result);
       remainRules = remainRules.filter((r) => r.key !== result[0]);
@@ -138,7 +138,7 @@ export function transform(
   }
   return [re, log];
 }
-export function forOne(
+export function forOneValue(
   value: any,
   rules: ChildRule[]
 ): [string, any] | undefined {

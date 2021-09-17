@@ -14,3 +14,7 @@ entities:
         constraints:
           # - [maxLength, 200]
           - required
+      - name: relationShip
+        relation:
+          n: one
+          to: bar

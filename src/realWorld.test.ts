@@ -12,7 +12,7 @@ test("basic entities", () => {
   const r = new MapToArrayRule("$.entities", "name");
   const r2 = new MapToArrayRule("$..properties", "name");
   expect(obj).not.toBeNull;
-  const re = chain(r, r2).run(obj);
+  const re = chain(...[r, r2]).run(obj);
   expect(re[0]).toEqual(resultO);
   expect(re[0]).toEqual(resultO);
 });
@@ -43,11 +43,54 @@ test("short on parent entities", () => {
     new ChildRule("type", Joi.string()),
   ]);
   const r4 = new DotAsNestRule("$..properties", ".");
-
   const re = chain(r, r4, r2, r3).run(obj);
-  // dump(re)
   expect(re[0]).toEqual(resultO);
-  // console.log(yaml.dump(resultO))
+});
+
+test("relation ship shorted", () => {
+  const [obj, resultO] = useTestAndResult(
+    "entitiesWithRelationshipShorted",
+    "entities"
+  );
+
+  const r = new MapToArrayRule("$.entities", "name");
+  const r2 = new MapToArrayRule("$..properties", "name");
+  const r3 = new ShortOnParentRule("$..properties[*]", [
+    new ChildRule("type", Joi.string()),
+    new ChildRule(
+      "relation",
+      Joi.array().ordered(Joi.string().valid("one", "many"), Joi.string())
+    ),
+    new ChildRule("constraints", Joi.array().items(Joi.string())),
+  ]);
+  const r4 = new DotAsNestRule("$..properties", ".");
+  const r5 = new ShortOnParentRule("$..relation", [
+    new ChildRule("n", Joi.string().valid("one", "many")),
+    new ChildRule("to", Joi.string()),
+  ]);
+  const re = chain(r, r4, r2, r3, r5).run(obj);
+  expect(re[0]).toEqual(resultO);
+});
+test("relation ship shorted with string", () => {
+  const [obj, resultO] = useTestAndResult(
+    "entitiesWithRelationshipStringShorted",
+    "entities"
+  );
+
+  const r = new MapToArrayRule("$.entities", "name");
+  const r2 = new MapToArrayRule("$..properties", "name");
+  const r3 = new ShortOnParentRule("$..properties[*]", [
+    new ChildRule("relation", Joi.string().regex(/^(one|many)\-(\w+)$/)),
+    new ChildRule("type", Joi.string()),
+    new ChildRule("constraints", Joi.array().items(Joi.string())),
+  ]);
+  const r4 = new DotAsNestRule("$..properties", ".");
+  const r5 = new ShortOnParentRule("$..relation", [
+    new ChildRule("n", Joi.string().valid("one", "many")),
+    new ChildRule("to", Joi.string()),
+  ],"-");
+  const re = chain(r, r4, r2, r3, r5).run(obj);
+  expect(re[0]).toEqual(resultO);
 });
 test("functions", () => {
   const [obj, result] = useTestAndResult("functions");
