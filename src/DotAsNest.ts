@@ -1,15 +1,17 @@
 import _ from "lodash";
-import { info, Log, Rule, warn } from "./Shorthand";
+import { info, Log, Rule, warn, Result } from "./Shorthand";
 import jp from "jsonpath";
+import { defaultValueHolder } from ".";
+import { smartSet } from "./smartSet";
 
 export class DotAsNestRule extends Rule {
-  run = (obj: object): [object, Log[]] => {
+  run = (obj: object): Result => {
     return applyByRule(obj, this);
   };
   constructor(
     public applyTo: string,
     public split: string,
-    public valueHolder: string | undefined = '_$'
+    public valueHolder: string | undefined = defaultValueHolder
   ) {
     super();
   }
@@ -19,46 +21,26 @@ export function transform(
   value: object,
   split: string,
   valueHolder: string | undefined
-): [object, Log[]] {
+): Result {
   let re = { ...value };
   //console.log('value :>> ', value);
   let logs: Log[] = [];
   keys.forEach((key) => {
-    const partPath = findMaxMatchPath(re, key.split(split));
-    //console.log('partPath :>> ', partPath);
-    const existedValue = _.clone(_(re).get(partPath));
-    //console.log('existedValue :>> ', existedValue);
-    if (partPath !== undefined && !_.isPlainObject(existedValue)) {
-      if (valueHolder) {
-        const v = re[key];
-        re = _(re).omit(key).value();
-        if (_.isArray(existedValue)) {
-          re = _(re)
-          .set(partPath,{}).value()
-        }
-        re = _(re)
-          .set([...partPath, valueHolder], existedValue)
-          .value();
-        //console.log('re :>> ', re);
-        re = _(re).set(key.split(split), v).value();
-        //console.log("re :>> ", re);
-      } else {
-        logs.push(
-          warn(
-            `${partPath.toString()} is already defined and not a object, overwrite is  `,
-            key
-          )
-        );
-      }
-    } else {
-      const v = re[key];
-      re = _(re).omit(key).value();
-      re = _(re).set(key.split(split), v).value();
+    const v = re[key];
+    const path = key.split(split);
+    re = _.omit(re, key);
+    try {
+      re = smartSet(re, path, v, {
+        allowOverwrite: valueHolder !== undefined,
+        valueHolder,
+      });
+    } catch (e) {
+      logs.push(warn("overwrite disallowed", key));
     }
   });
   return [re, logs];
 }
-export function applyByRule(obj: object, rule: DotAsNestRule): [object, Log[]] {
+export function applyByRule(obj: object, rule: DotAsNestRule): Result {
   const paths = jp.paths(obj, rule.applyTo);
   let re = obj;
   let logs: Log[] = [];
@@ -73,9 +55,9 @@ export function applyByRuleForOneNode(
   obj: object,
   path: string[],
   rule: DotAsNestRule
-): [object, Log[]] {
+): Result {
   const target = jp.value(obj, path);
-  if (target && _.isObject(target)) {
+  if (target && _.isPlainObject(target)) {
     const keys = _.keys(target).filter((key) => key.indexOf(rule.split) > -1);
     //console.log('keys :>> ', keys);
     if (keys.length > 0) {
@@ -103,7 +85,7 @@ export function applyByRuleForOneNode(
       ];
     }
   } else {
-    return [obj, [warn("target is not a object", path.toString())]];
+    return [obj, [warn("target is not a plain object", path.toString())]];
   }
 }
 function findMaxMatchPath(obj: object, path: string[]): string[] | undefined {
