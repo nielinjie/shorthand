@@ -6,6 +6,7 @@ import Joi from "joi";
 import { DotAsNestRule } from "./DotAsNest";
 import { MapToArrayRule } from "./MapToArray";
 import { ShortOnParentRule } from "./ShortOnParent";
+import { defaultValueHolder } from ".";
 
 //TODO 通过rule，自动寻找runner
 
@@ -22,7 +23,7 @@ test.each([
         { key: "married", schema: Joi.boolean() },
       ],
       undefined,
-      "_$"
+      defaultValueHolder
     ),
   ],
 ])("yaml %s", (a, r) => {
@@ -42,7 +43,7 @@ test("in one", () => {
       { key: "married", schema: Joi.boolean() },
     ],
     undefined,
-    "_$"
+    defaultValueHolder
   );
   expect(obj).not.toBeNull;
   const re = r2.add(r).run(obj);
@@ -54,6 +55,7 @@ test("in one 2", () => {
   const r = new DotAsNestRule("people", ".");
   const r2 = new MapToArrayRule("people", "name");
   expect(obj).not.toBeNull;
+  r.setDebug(dump)
   const re = r.add(r2).run(obj);
   expect(re[0]).toEqual(resultO);
 });
@@ -65,4 +67,8 @@ function useTestAndResult(name: string): [object, object] {
   const resultO = yaml.load(fs.readFileSync(result).toString());
   const obj = yaml.load(string);
   return [obj, resultO];
+}
+function dump(re) {
+  console.log(yaml.dump(re[0]));
+  // console.log(re[1]);
 }
