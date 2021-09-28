@@ -1,3 +1,4 @@
+import { defaultValueHolder } from ".";
 import { applyByRule, transform } from "./MapToArray";
 test("normalize", () => {
   const rule = { keyPropertyName: "name", applyTo: "target" };
@@ -45,7 +46,7 @@ test("applyTo one wither order", () => {
   });
 });
 test("applyTo one with value holder", () => {
-  const rule = { keyPropertyName: "name", applyTo: "$.t", valueHolder: "_$" };
+  const rule = { keyPropertyName: "name", applyTo: "$.t", valueHolder: defaultValueHolder };
   const obj = { a: 1, t: { b: "hello", c: "world" } };
   const result = applyByRule(obj, rule);
   expect(result[0]).toEqual({
@@ -61,7 +62,7 @@ test("applyTo one with value holder and index", () => {
     keyPropertyName: "name",
     indexPropertyName: "order",
     applyTo: "$.t",
-    valueHolder: "_$",
+    valueHolder: defaultValueHolder,
   };
   const obj = { a: 1, t: { b: "hello", c: "world" } };
   const result = applyByRule(obj, rule);
@@ -95,7 +96,7 @@ test("applyTo deep", () => {
   });
 });
 test("applyTo deep with value holder", () => {
-  const rule = { keyPropertyName: "name", applyTo: "$..t", valueHolder: "_$" };
+  const rule = { keyPropertyName: "name", applyTo: "$..t", valueHolder: defaultValueHolder };
   const obj = {
     a: 1,
     foo: [{ t: { b: "hello", c: "world" } }],

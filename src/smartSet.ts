@@ -9,8 +9,9 @@ export function smartSet(
   const { allowOverwrite, valueHolder } = option;
   const pathArray: string[] = typeof path === "string" ? path.split(".") : path;
   const longestPath = findLongestMatchPath(obj, pathArray);
-  //   console.log('longestPath :>> ', longestPath);
+    // console.log('longestPath :>> ', longestPath);
   const theClosestValue = smartGet(obj, longestPath);
+  // console.log('theClosestValue :>> ', theClosestValue);
   assert(theClosestValue !== undefined);
 
   if (_.isPlainObject(theClosestValue)) {
@@ -23,8 +24,15 @@ export function smartSet(
       if (_.isArray(theClosestValue)) {
         _.set(re, longestPath, {});
       }
+            // _.set(re, pathArray, value);
+
       _.set(re, [...(longestPath ?? []), valueHolder ?? "_$"], theClosestValue);
+      // console.log('re :>> ', re);
+      // console.log('pathArray :>> ', pathArray);
+      // console.log('value :>> ', value);
       _.set(re, pathArray, value);
+      // console.log('re :>> ', re);
+      return re
     } else {
       throw new Error("disallow overwrite - " + longestPath?.toString());
     }

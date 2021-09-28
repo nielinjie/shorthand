@@ -2,13 +2,14 @@ import { applyByRule, DotAsNestRule, transform } from "./DotAsNest";
 import path from 'path';
 import fs from 'fs-extra';
 import yaml from 'js-yaml';
+import { defaultValueHolder } from ".";
 
 test("normal", () => {
   const result = transform(["a.b"], { "a.b": "hello" }, ".", undefined);
   expect(result[0]).toEqual({ a: { b: "hello" } });
 });
 test("normal", () => {
-  const result = transform(["a.b"], { a: "foo", "a.b": "hello" }, ".", "_$");
+  const result = transform(["a.b"], { a: "foo", "a.b": "hello" }, ".", defaultValueHolder);
   expect(result[0]).toEqual({ a: { _$: "foo", b: "hello" } });
 });
 test("apply to object", () => {
@@ -71,7 +72,7 @@ test("avoid overwrite", () => {
   );
 });
 test("avoid overwrite with valueHolder", () => {
-  const rule = { applyTo: "$.foo", split: ".", valueHolder: "_$" };
+  const rule = { applyTo: "$.foo", split: ".", valueHolder: defaultValueHolder };
   const obj = {
     a: 1,
     foo: { b: "kk", "b.d": "hello" },
@@ -83,7 +84,7 @@ test("avoid overwrite with valueHolder", () => {
   });
 });
 test("avoid overwrite with value holder", () => {
-  const rule = { applyTo: "$.foo", split: ".", valueHolder: "_$" };
+  const rule = { applyTo: "$.foo", split: ".", valueHolder: defaultValueHolder };
   const obj = {
     a: 1,
     foo: { b: ["kk"], "b.d": "hello" },

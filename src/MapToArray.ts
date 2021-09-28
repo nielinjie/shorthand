@@ -1,17 +1,19 @@
 import _ from "lodash";
-import { info, Log, warn, Rule } from "./Shorthand";
-import jp from "jsonpath";
+import { info, Log, warn, Rule, Result } from "./Shorthand";
+import jp from "./jsonPath";
+
+import { defaultValueHolder } from ".";
 type StringKeyValueMap<T> = { [key: string]: T };
 
 export class MapToArrayRule extends Rule {
-  run = (obj: object): [object, Log[]] => {
+  run = (obj: object): Result => {
     return applyByRule(obj, this);
   };
   constructor(
     public applyTo: string,
     public keyPropertyName: string,
     public indexPropertyName: string | undefined = undefined,
-    public valueHolder: string | undefined = "_$"
+    public valueHolder: string | undefined = defaultValueHolder
   ) {
     super();
   }
@@ -50,15 +52,12 @@ export function transform(
     return [[], [warn(`MapToArrayRule: ${err}`)]];
   }
 }
-export function applyByRule(obj: any, rule: MapToArrayRule): [object, Log[]] {
+export function applyByRule(obj: any, rule: MapToArrayRule): Result {
   const paths = jp.paths(obj, rule.applyTo);
   let re = obj;
   let logs: Log[] = [];
   paths.forEach((path) => {
-    //   console.log("path",path)
-    //   console.log(re)
     const forOne = applyByRuleForOneNode(re, path, rule, rule.valueHolder);
-
     re = forOne[0];
     logs = [...logs, ...forOne[1]];
   });
@@ -69,7 +68,7 @@ export function applyByRuleForOneNode(
   path: string[],
   rule: MapToArrayRule,
   valueHolder: string | undefined
-): [object, Log[]] {
+): Result {
   const target = jp.value(obj, path);
   if (target && _.isPlainObject(target)) {
     // console.log(target);

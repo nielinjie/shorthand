@@ -1,7 +1,9 @@
 import { info, Log, Result, Rule, warn } from "./Shorthand";
-import jp from "jsonpath";
+import jp from "./jsonPath";
 import _ from "lodash";
 import { smartSet } from "./smartSet";
+import { defaultValueHolder } from ".";
+import { toLodashPath } from "./objectPath";
 
 export class RelocateRule extends Rule {
   run = (obj: object): Result => {
@@ -11,7 +13,7 @@ export class RelocateRule extends Rule {
     public applyTo: string,
     public fromKey: string,
     public to: string | ((from: string) => string),
-    public valueHolder?: string
+    public valueHolder: string | undefined = defaultValueHolder
   ) {
     super();
   }
@@ -34,6 +36,7 @@ export function applyByRuleForOneNode(
 ): Result {
   const target = jp.value(obj, path);
   if (target && _.isPlainObject(target)) {
+      console.log('target :>> ', target);
     const [newTarget, logs] = transform(target, rule);
     let newObj = { ...obj };
     if (logs.length > 0) {
@@ -50,14 +53,13 @@ export function applyByRuleForOneNode(
   }
 }
 export function transform(obj: object, rule: RelocateRule): Result {
-
-  const allKeys = _(obj).keys().value();
-  //TODO nest keys?
-  //TODO dynamic keys?
-  const willRelocateKeys = allKeys.filter((_) => rule.fromKey === _);
+  console.log("obj :>> ", obj);
+  const willRelocateKeys = jp.paths(obj, rule.fromKey);
+  console.log("willRelocateKeys :>> ", willRelocateKeys);
   let newObj = { ...obj };
-  let logs=[]
-  willRelocateKeys.forEach((rKey) => {
+  let logs = [];
+  willRelocateKeys.forEach((rJsonKey) => {
+    const rKey = toLodashPath(rJsonKey);
     const oldValue = _(newObj).get(rKey);
     newObj = _.omit(newObj, rKey);
     let newPath;
@@ -66,8 +68,17 @@ export function transform(obj: object, rule: RelocateRule): Result {
     } else if (_.isFunction(rule.to)) {
       newPath = (rule.to as Function)(rKey);
     }
-    newObj = _.omit(newObj,rKey)
-    newObj = smartSet(newObj, newPath, oldValue,{allowOverwrite: rule.valueHolder!==undefined,valueHolder:rule.valueHolder});
+    newObj = _.omit(newObj, rKey);
+    // console.log("newPath :>> ", newPath);
+    // console.log("newObj :>> ", newObj);
+    // console.log("oldValue :>> ", oldValue);
+    newObj = smartSet(newObj, newPath, oldValue, {
+      //   allowOverwrite: rule.valueHolder !== undefined,
+      allowOverwrite: true,
+      //   valueHolder: rule.valueHolder,
+      valueHolder: "_$",
+    });
+    // console.log("newObj :>> ", newObj);
   });
   return [newObj, logs];
 }

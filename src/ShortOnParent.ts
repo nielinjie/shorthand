@@ -1,7 +1,8 @@
 import { Schema, ValidationResult } from "joi";
 import _ from "lodash";
-import { info, Log, warn, Rule } from "./Shorthand";
-import jp from "jsonpath";
+import { info, Log, warn, Rule, Result } from "./Shorthand";
+import jp from "./jsonPath";
+import { defaultValueHolder } from ".";
 export function validateAnd(
   value: any,
   a: Schema,
@@ -16,14 +17,14 @@ export function validateAnd(
 }
 
 export class ShortOnParentRule extends Rule {
-  run = (obj: object): [object, Log[]] => {
+  run = (obj: object): Result => {
     return applyByRule(obj, this);
   };
   constructor(
     public applyTo: string,
     public childRules: ChildRule[],
     public split: string | undefined = ',',
-    public valueHolder: string | undefined = '_$'
+    public valueHolder: string | undefined = defaultValueHolder
   ) {
     super();
   }
@@ -33,8 +34,6 @@ export function applyByRule(obj: any, rule: ShortOnParentRule): [any, Log[]] {
   let re = obj;
   let logs: Log[] = [];
   paths.forEach((path) => {
-    //   console.log("path",path)
-    //   console.log(re)
     const forOne = applyByRuleForOneNode(re, path, rule, rule.valueHolder);
     re = forOne[0];
     logs = [...logs, ...forOne[1]];

@@ -1,4 +1,5 @@
 import Joi from "joi";
+import { defaultValueHolder } from ".";
 import { transform, ChildRule, applyByRule } from "./ShortOnParent";
 test("normal", () => {
   const rules: ChildRule[] = [{ key: "a", schema: Joi.number() }];
@@ -97,7 +98,7 @@ test("simple apply through value holder", () => {
     { key: "b", schema: Joi.string() },
     { key: "a", schema: Joi.number() },
   ];
-  const rule = { applyTo: "$.foo", childRules: rules, valueHolder: "_$" };
+  const rule = { applyTo: "$.foo", childRules: rules, valueHolder: defaultValueHolder };
   const obj = { a: 1, foo: { _$: [1, "jason"] } };
   const re = applyByRule(obj, rule);
   expect(re[0]).toEqual({ a: 1, foo: { a: 1, b: "jason" } });
@@ -108,7 +109,7 @@ test("simple apply through value holder with other properties existed", () => {
     { key: "b", schema: Joi.string() },
     { key: "a", schema: Joi.number() },
   ];
-  const rule = { applyTo: "$.foo", childRules: rules, valueHolder: "_$" };
+  const rule = { applyTo: "$.foo", childRules: rules, valueHolder: defaultValueHolder };
   const obj = { a: 1, foo: { _$: [1, "jason"], c: "hoo" } };
   const re = applyByRule(obj, rule);
   expect(re[0]).toEqual({ a: 1, foo: { a: 1, b: "jason", c: "hoo" } });
@@ -152,7 +153,7 @@ test(" apply to string value holder", () => {
     applyTo: "$.foo",
     childRules: rules,
     split: ",",
-    valueHolder: "_$",
+    valueHolder: defaultValueHolder,
   };
   const obj = { a: 1, foo: { _$: "1, jason" } };
   const re = applyByRule(obj, rule);
@@ -187,7 +188,7 @@ test(" apply in a array with value holder", () => {
 
     { key: "a", schema: Joi.number() },
   ];
-  const rule = { applyTo: "$.foo[*]", childRules: rules, valueHolder: "_$" };
+  const rule = { applyTo: "$.foo[*]", childRules: rules, valueHolder: defaultValueHolder };
   const obj = {
     a: 1,
     foo: [[1, "jason"], { _$: [2, "elsa"] }],

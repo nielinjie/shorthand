@@ -45,6 +45,13 @@ test.only.each([
     7,
     { a: 1, b: { c: { _$: [2, 3], a: 7 }, d: 4 } },
   ],
+  [
+    { a: 1, b: { c: [2, 3], d: 4 } },
+    "b.c.a",
+    { e: "foo" },
+    { a: 1, b: { c: { _$: [2, 3], a: { e: "foo" } }, d: 4 } },
+  ],
+  [{ a: 1, c: "foo" }, "c", { d: 2 }, { a: 1, c: { d: 2 } }],
 ])("set in %s, by path %s", (obj, path, value, r) => {
   const re = smartSet(obj, path, value, {
     allowOverwrite: true,

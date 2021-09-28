@@ -1,6 +1,6 @@
 import _ from "lodash";
 import { info, Log, Rule, warn, Result } from "./Shorthand";
-import jp from "jsonpath";
+import jp from "./jsonPath";
 import { defaultValueHolder } from ".";
 import { smartSet } from "./smartSet";
 
@@ -88,11 +88,4 @@ export function applyByRuleForOneNode(
     return [obj, [warn("target is not a plain object", path.toString())]];
   }
 }
-function findMaxMatchPath(obj: object, path: string[]): string[] | undefined {
-  for (let i = path.length; i > 0; i--) {
-    const part = _(path).slice(0, i).value();
-    if (_(obj).get(part) !== undefined) {
-      return part;
-    }
-  }
-}
+

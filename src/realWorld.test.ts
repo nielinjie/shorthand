@@ -71,7 +71,7 @@ test("relation ship shorted", () => {
   const re = chain(r, r4, r2, r3, r5).run(obj);
   expect(re[0]).toEqual(resultO);
 });
-test("relation ship shorted with string", () => {
+test.only("relation ship shorted with string", () => {
   const [obj, resultO] = useTestAndResult(
     "entitiesWithRelationshipStringShorted",
     "entities"
@@ -89,6 +89,7 @@ test("relation ship shorted with string", () => {
     new ChildRule("n", Joi.string().valid("one", "many")),
     new ChildRule("to", Joi.string()),
   ],"-");
+  // r.setDebug(dump)
   const re = chain(r, r4, r2, r3, r5).run(obj);
   expect(re[0]).toEqual(resultO);
 });
@@ -135,5 +136,5 @@ function useTestAndResult(
 }
 function dump(re) {
   console.log(yaml.dump(re[0]));
-  console.log(re[1]);
+  // console.log(re[1]);
 }
