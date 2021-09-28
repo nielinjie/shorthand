@@ -3,3 +3,4 @@ export { MapToArrayRule } from "./MapToArray";
 export * from "./RuleBuilder";
 export { ShortOnParentRule, ChildRule } from "./ShortOnParent";
 export * from "./Shorthand";
+export let defaultValueHolder = '_$'
