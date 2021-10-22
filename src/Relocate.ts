@@ -36,7 +36,7 @@ export function applyByRuleForOneNode(
 ): Result {
   const target = jp.value(obj, path);
   if (target && _.isPlainObject(target)) {
-      console.log('target :>> ', target);
+    //   console.log('target :>> ', target);
     const [newTarget, logs] = transform(target, rule);
     let newObj = { ...obj };
     if (logs.length > 0) {
@@ -53,9 +53,9 @@ export function applyByRuleForOneNode(
   }
 }
 export function transform(obj: object, rule: RelocateRule): Result {
-  console.log("obj :>> ", obj);
+//   console.log("obj :>> ", obj);
   const willRelocateKeys = jp.paths(obj, rule.fromKey);
-  console.log("willRelocateKeys :>> ", willRelocateKeys);
+//   console.log("willRelocateKeys :>> ", willRelocateKeys);
   let newObj = { ...obj };
   let logs = [];
   willRelocateKeys.forEach((rJsonKey) => {

@@ -23,7 +23,7 @@ test("get agin", () => {
   const re = smartGet(obj, "b.c");
   expect(re).toEqual(2);
 });
-test.only.each([
+test.each([
   [{ a: 1, b: { c: 2, d: 4 } }, "b.c", 7, { a: 1, b: { c: 7, d: 4 } }],
   [
     { a: 1, b: { c: 2, d: 4 } },

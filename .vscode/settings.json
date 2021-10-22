@@ -13,7 +13,13 @@
         "titleBar.activeBackground": "#f8a8e9",
         "titleBar.activeForeground": "#15202b",
         "titleBar.inactiveBackground": "#f8a8e999",
-        "titleBar.inactiveForeground": "#15202b99"
+        "titleBar.inactiveForeground": "#15202b99",
+        "editorGroup.border": "#fcd7f5",
+        "panel.border": "#fcd7f5",
+        "sash.hoverBorder": "#fcd7f5",
+        "sideBar.border": "#fcd7f5",
+        "statusBarItem.remoteBackground": "#f8a8e9",
+        "statusBarItem.remoteForeground": "#15202b"
     },
     "peacock.color": "#f8a8e9"
 }

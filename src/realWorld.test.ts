@@ -4,8 +4,10 @@ import yaml from "js-yaml";
 import { MapToArrayRule } from "./MapToArray";
 import { ChildRule, ShortOnParentRule } from "./ShortOnParent";
 import Joi from "joi";
-import { chain } from "./Shorthand";
+import { chain, Rule } from "./Shorthand";
 import { DotAsNestRule } from "./DotAsNest";
+import { RelocateRule } from "./Relocate";
+import { insertF } from "./objectPath";
 
 test("basic entities", () => {
   const [obj, resultO] = useTestAndResult("basicEntities", "entities");
@@ -71,7 +73,7 @@ test("relation ship shorted", () => {
   const re = chain(r, r4, r2, r3, r5).run(obj);
   expect(re[0]).toEqual(resultO);
 });
-test.only("relation ship shorted with string", () => {
+test("relation ship shorted with string", () => {
   const [obj, resultO] = useTestAndResult(
     "entitiesWithRelationshipStringShorted",
     "entities"
@@ -85,19 +87,31 @@ test.only("relation ship shorted with string", () => {
     new ChildRule("constraints", Joi.array().items(Joi.string())),
   ]);
   const r4 = new DotAsNestRule("$..properties", ".");
-  const r5 = new ShortOnParentRule("$..relation", [
-    new ChildRule("n", Joi.string().valid("one", "many")),
-    new ChildRule("to", Joi.string()),
-  ],"-");
+  const r5 = new ShortOnParentRule(
+    "$..relation",
+    [
+      new ChildRule("n", Joi.string().valid("one", "many")),
+      new ChildRule("to", Joi.string()),
+    ],
+    "-"
+  );
   // r.setDebug(dump)
   const re = chain(r, r4, r2, r3, r5).run(obj);
   expect(re[0]).toEqual(resultO);
 });
 test("functions", () => {
   const [obj, result] = useTestAndResult("functions");
+    // const rr = new RelocateRule(
+    //   "$.functions",
+    //   "$..redirect",
+    //   insertF("command")
+    // );
+      
   const r = new MapToArrayRule("$.functions", "name");
   const r2 = new DotAsNestRule("$..annotations", ".");
-  const re = chain(r, r2).run(obj);
+  const rr2 = new RelocateRule('$..functions[*]','redirect',insertF("command"))
+  const re = chain(r, r2,rr2).run(obj);
+  dump(re)
   expect(re[0]).toEqual(result);
 });
 test("pages", () => {

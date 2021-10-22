@@ -35,13 +35,22 @@ test.each([
   ["a.b.f.g", "^.e", "a.b.f.e"],
   ["a.b.f.g", "^.^.e", "a.b.e"],
   ["a", "^.^.e", "e"],
+  ["a", "^", ""],
+  ["", "a", "a"],
 ])("full = %s & %s", (base, re, full) => {
   expect(join(base, re)).toEqual(full);
 });
-test.only('offset',()=>{
-    const path = 'a.b.c.e'
-    const re = offset(path)
-    expect(re).toEqual('a.b.c')
-    const r2 = offset(path,-2)
-    expect(r2).toEqual('a.b')
-})
+test("more than tow join", () => {
+  const base = "a";
+  const b = "b";
+  expect(join(base, b, "c")).toEqual("a.b.c");
+  expect(join(base, b, "^", "c")).toEqual("a.c");
+  expect(join(base, "^", "c")).toEqual("c");
+});
+test("offset", () => {
+  const path = "a.b.c.e";
+  const re = offset(path);
+  expect(re).toEqual("a.b.c");
+  const r2 = offset(path, -2);
+  expect(r2).toEqual("a.b");
+});

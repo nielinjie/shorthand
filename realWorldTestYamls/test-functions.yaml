@@ -10,8 +10,7 @@ functions:
   setTime: 
     extend: functions/command
     resource: setTimeRequest
-    command:
-      redirect: clockShow
+    redirect: clockShow
     annotations:
       page.menuPath: SetTime
       presentation: withUrl

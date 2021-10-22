@@ -1,9 +1,6 @@
 import {
-  relative,
   join,
-  toLodashPath,
   joinF,
-  last,
   insertF,
 } from "./objectPath";
 import { RelocateRule } from "./Relocate";
@@ -20,14 +17,12 @@ test("for from", () => {
   //all of b's children relocate to c
   const r = new RelocateRule("$", "b", (key) => join(key, "^.c"));
   const re = r.run(obj);
-  console.log("re[1] :>> ", re[1]);
   expect(re[0]).toEqual({ a: 1, c: { d: 2 } });
 });
 test("relative move", () => {
   const obj = { a: 1, b: { d: 2 }, c: "foo" };
   const r = new RelocateRule("$", "b.d", joinF("^.^.c"));
   const re = r.run(obj);
-  console.log("re[1] :>> ", re[1]);
   expect(re[0]).toEqual({ a: 1, b: {}, c: 2 });
 });
 test("relative move", () => {
@@ -36,18 +31,35 @@ test("relative move", () => {
   const re = r.run(obj);
   expect(re[0]).toEqual({ functions: { foo: { parameter: { io: "foo" } } } });
 });
-test.only("relative move", () => {
+test("relative move", () => {
   const obj = { functions: { foo: { io: "foo" }, bar: { out: "bar" } } };
   const r = new RelocateRule(
     "$.functions",
     "$..[io,out]",
-    insertF("^.parameter")
+    insertF("parameter")
   );
   const re = r.run(obj);
   dump(re);
   expect(re[0]).toEqual({
     functions: {
       foo: { parameter: { io: "foo" } },
+      bar: { parameter: { out: "bar" } },
+    },
+  });
+});
+//skip 是因为 ['',] 这种参数jsonpath-plus不支持
+test.skip("relative move with dot key", () => {
+  const obj = { functions: { foo: { 'io.nest' : "foo" }, bar: { out: "bar" } } };
+  const r = new RelocateRule(
+    "$.functions",
+    `$..['io.nest',out]`,
+    insertF("parameter")
+  );
+  const re = r.run(obj);
+  dump(re);
+  expect(re[0]).toEqual({
+    functions: {
+      foo: { parameter: { 'io.nest': "foo" } },
       bar: { parameter: { out: "bar" } },
     },
   });

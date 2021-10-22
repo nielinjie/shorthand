@@ -33,13 +33,30 @@ import jp from "./jsonPath";
 // });
 
 
-test.only("some path", () => {
+test("some path", () => {
   const obj = { functions: { foo: { io: "foo" }, bar: { out: "bar" } } };
   const jsonp = "$..[io,out]";
-  // const jsonp = "$..['io']";
   const paths = jp.paths(obj, jsonp);
   expect(paths).toEqual([
     ["$", "functions", "foo", "io"],
     ["$", "functions", "bar", "out"],
+  ]);
+});
+//skip 是因为 ['',] 这种参数jsonpath-plus不支持
+test.skip("some path", () => {
+  const obj = { functions: { foo: { 'io.nest': "foo" }, bar: { out: "bar" } } };
+  const jsonp = "$..['io.nest',out]";
+  const paths = jp.paths(obj, jsonp);
+  expect(paths).toEqual([
+    ["$", "functions", "foo", "io.nest"],
+    ["$", "functions", "bar", "out"],
+  ]);
+});
+test("some path", () => {
+  const obj = { functions: { foo: { "io.nest": "foo" }, bar: { out: "bar" } } };
+  const jsonp = "$..['io.nest']";
+  const paths = jp.paths(obj, jsonp);
+  expect(paths).toEqual([
+    ["$", "functions", "foo", "io.nest"],
   ]);
 });

@@ -43,17 +43,17 @@ export function join(
   if (pn === 0) {
     const fullArray = [...baseArray, ...relativeArray];
 
-    return fullArray.join(pathSplit);
+    return fullArray.filter((_) => _.trim() !== "").join(pathSplit);
   } else {
     const fullArray = [
       ...baseArray.slice(undefined, baseArray.length - pn),
       ...relativeArray.slice(pn),
     ];
-    return fullArray.join(pathSplit);
+    return fullArray.filter((_) => _.trim() !== "").join(pathSplit);
   }
 }
-export function insertF(relative: string):(base:string)=> string {
-    return (base: string) => join(base, relative, last(base));
+export function insertF(relative: string): (base: string) => string {
+  return (base: string) => join(base, "^", relative, last(base));
 }
 export function joinF(relative: string): (base: string) => string {
   return (base: string) => join(base, relative);
