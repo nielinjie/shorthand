@@ -3,6 +3,14 @@ import _ from "lodash";
 import { info, Log, warn, Rule, Result } from "./Shorthand";
 import jp from "./jsonPath";
 import { defaultValueHolder } from ".";
+
+//TODO 把joi封装在本包，用户不用依赖joi。
+// export interface ChildSchema{
+//   validate(v:any):{
+//     error: Error|undefined;
+//     value: any|undefined;
+//   }
+// }
 export function validateAnd(
   value: any,
   a: Schema,

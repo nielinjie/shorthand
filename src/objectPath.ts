@@ -64,7 +64,7 @@ export function offset(path: string, num: number = -1): string {
   return re.join(pathSplit);
 }
 function parentNumber(relativeArray: string[]): number {
-  if (!supportR) throw new Error("not supported relative format");
+  if (!supportR(  relativeArray)) throw new Error("not supported relative format");
   return _.filter(relativeArray, (x: string) => x === parentName).length;
 }
 export function isSupportedRelative(relative: string): boolean {
