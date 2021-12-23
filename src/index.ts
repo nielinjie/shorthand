@@ -5,6 +5,7 @@ import _ from 'lodash';
 
 export { DotAsNestRule } from "./DotAsNest";
 export { MapToArrayRule } from "./MapToArray";
+export {SimpleSetterRule} from "./SimpleSetter";
 export * from "./RuleBuilder";
 export { ShortOnParentRule, ChildRule } from "./ShortOnParent";
 export {RelocateRule,insertF} 
