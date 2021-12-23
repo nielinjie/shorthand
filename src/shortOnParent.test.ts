@@ -1,6 +1,6 @@
 import Joi from "joi";
 import { defaultValueHolder } from ".";
-import { transform, ChildRule, applyByRule } from "./ShortOnParent";
+import { transform, ChildRule, applyByRule, ShortOnParentRule } from "./ShortOnParent";
 test("normal", () => {
   const rules: ChildRule[] = [{ key: "a", schema: Joi.number() }];
   const re = transform([1], rules, [""], [1]);
@@ -90,7 +90,7 @@ test("simple apply", () => {
   ];
   const rule = { applyTo: "$.foo", childRules: rules };
   const obj = { a: 1, foo: [1, "jason"] };
-  const re = applyByRule(obj, rule);
+  const re = applyByRule(obj, fromObject(rule));
   expect(re[0]).toEqual({ a: 1, foo: { a: 1, b: "jason" } });
 });
 test("simple apply through value holder", () => {
@@ -100,7 +100,7 @@ test("simple apply through value holder", () => {
   ];
   const rule = { applyTo: "$.foo", childRules: rules, valueHolder: defaultValueHolder };
   const obj = { a: 1, foo: { _$: [1, "jason"] } };
-  const re = applyByRule(obj, rule);
+  const re = applyByRule(obj, fromObject(rule));
   expect(re[0]).toEqual({ a: 1, foo: { a: 1, b: "jason" } });
 });
 
@@ -111,7 +111,7 @@ test("simple apply through value holder with other properties existed", () => {
   ];
   const rule = { applyTo: "$.foo", childRules: rules, valueHolder: defaultValueHolder };
   const obj = { a: 1, foo: { _$: [1, "jason"], c: "hoo" } };
-  const re = applyByRule(obj, rule);
+  const re = applyByRule(obj, fromObject(rule));
   expect(re[0]).toEqual({ a: 1, foo: { a: 1, b: "jason", c: "hoo" } });
 });
 
@@ -123,7 +123,7 @@ test("simple apply to string, priority works", () => {
   ];
   const rule = { applyTo: "$.foo", childRules: rules, split: "," };
   const obj = { a: 1, foo: "1, jason" };
-  const re = applyByRule(obj, rule);
+  const re = applyByRule(obj, fromObject(rule));
   expect(re[0]).toEqual(obj);
   expect(re[1]).toEqual(
     expect.arrayContaining([
@@ -141,7 +141,7 @@ test("simple apply to string", () => {
   ];
   const rule = { applyTo: "$.foo", childRules: rules, split: "," };
   const obj = { a: 1, foo: "1, jason" };
-  const re = applyByRule(obj, rule);
+  const re = applyByRule(obj, fromObject(rule));
   expect(re[0]).toEqual({ a: 1, foo: { a: 1, b: "jason" } });
 });
 test(" apply to string value holder", () => {
@@ -156,7 +156,7 @@ test(" apply to string value holder", () => {
     valueHolder: defaultValueHolder,
   };
   const obj = { a: 1, foo: { _$: "1, jason" } };
-  const re = applyByRule(obj, rule);
+  const re = applyByRule(obj, fromObject(rule));
   expect(re[0]).toEqual({ a: 1, foo: { a: 1, b: "jason" } });
 });
 test("simple apply in a array", () => {
@@ -173,7 +173,7 @@ test("simple apply in a array", () => {
       [2, "elsa"],
     ],
   };
-  const re = applyByRule(obj, rule);
+  const re = applyByRule(obj, fromObject(rule));
   expect(re[0]).toEqual({
     a: 1,
     foo: [
@@ -193,7 +193,7 @@ test(" apply in a array with value holder", () => {
     a: 1,
     foo: [[1, "jason"], { _$: [2, "elsa"] }],
   };
-  const re = applyByRule(obj, rule);
+  const re = applyByRule(obj, fromObject(rule));
   expect(re[0]).toEqual({
     a: 1,
     foo: [
@@ -202,3 +202,6 @@ test(" apply in a array with value holder", () => {
     ],
   });
 });
+function fromObject(obj:any):ShortOnParentRule{
+  return new ShortOnParentRule(obj.applyTo, obj.childRules, obj.split, obj.valueHolder);
+}

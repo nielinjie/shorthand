@@ -4,10 +4,13 @@ import yaml from "js-yaml";
 import { MapToArrayRule } from "./MapToArray";
 import { ChildRule, ShortOnParentRule } from "./ShortOnParent";
 import Joi from "joi";
-import { chain, Rule } from "./Shorthand";
+import { chain } from "./Shorthand";
 import { DotAsNestRule } from "./DotAsNest";
 import { RelocateRule } from "./Relocate";
 import { insertF } from "./objectPath";
+import { SimpleSetterRule } from "./SimpleSetter";
+import _ from "lodash";
+import { removeHoldNilValue } from ".";
 
 test("basic entities", () => {
   const [obj, resultO] = useTestAndResult("basicEntities", "entities");
@@ -16,7 +19,20 @@ test("basic entities", () => {
   expect(obj).not.toBeNull;
   const re = chain(...[r, r2]).run(obj);
   expect(re[0]).toEqual(resultO);
-  expect(re[0]).toEqual(resultO);
+});
+test("entities with no properties", () => {
+  const [obj, resultO] = useTestAndResult("entitiesWithDefaults", "entities");
+  const r = new MapToArrayRule("$.entities", "name");
+  const rd = new SimpleSetterRule(
+    "$.entities[*]",
+    "properties",
+    "properties",
+    []
+  );
+  const r2 = new MapToArrayRule("$..properties", "name");
+  expect(obj).not.toBeNull;
+  const re = chain(...[r, rd, r2]).run(obj);
+  expect(removeHoldNilValue(re[0])).toEqual(resultO);
 });
 test("short on parent entities no constraints", () => {
   const [obj, resultO] = useTestAndResult(
@@ -31,7 +47,6 @@ test("short on parent entities no constraints", () => {
 
   expect(obj).not.toBeNull;
   const re = chain(r, r3, r2).run(obj);
-  expect(re[0]).toEqual(resultO);
   expect(re[0]).toEqual(resultO);
 });
 test("short on parent entities", () => {
@@ -101,17 +116,21 @@ test("relation ship shorted with string", () => {
 });
 test("functions", () => {
   const [obj, result] = useTestAndResult("functions");
-    // const rr = new RelocateRule(
-    //   "$.functions",
-    //   "$..redirect",
-    //   insertF("command")
-    // );
-      
+  // const rr = new RelocateRule(
+  //   "$.functions",
+  //   "$..redirect",
+  //   insertF("command")
+  // );
+
   const r = new MapToArrayRule("$.functions", "name");
   const r2 = new DotAsNestRule("$..annotations", ".");
-  const rr2 = new RelocateRule('$..functions[*]','redirect',insertF("command"))
-  const re = chain(r, r2,rr2).run(obj);
-  dump(re)
+  const rr2 = new RelocateRule(
+    "$..functions[*]",
+    "redirect",
+    insertF("command")
+  );
+  const re = chain(r, r2, rr2).run(obj);
+  //dump(re);
   expect(re[0]).toEqual(result);
 });
 test("pages", () => {
@@ -152,3 +171,4 @@ function dump(re) {
   console.log(yaml.dump(re[0]));
   // console.log(re[1]);
 }
+

@@ -33,7 +33,7 @@ export class RuleBuilder {
     }
   }
   build() {
-    return this.wrapped;
+    return this.wrapped!;
   }
   constructor(public applyIn: string) {}
 }

@@ -1,10 +1,10 @@
 import { defaultValueHolder } from ".";
-import { applyByRule, transform } from "./MapToArray";
+import { applyByRule, MapToArrayRule, transform } from "./MapToArray";
 test("normalize", () => {
   const rule = { keyPropertyName: "name", applyTo: "target" };
   const re = transform(
     { b: { text: "hello" }, c: { text: "world" } },
-    rule,
+    fromObject(rule),
     undefined
   );
   expect(re[0]).toEqual([
@@ -19,7 +19,7 @@ test("applyTo one", () => {
     valueHolder: undefined,
   };
   const obj = { a: 1, t: { b: { text: "hello" }, c: { text: "world" } } };
-  const result = applyByRule(obj, rule);
+  const result = applyByRule(obj, fromObject(rule));
   expect(result[0]).toEqual({
     a: 1,
     t: [
@@ -36,7 +36,7 @@ test("applyTo one wither order", () => {
     indexPropertyName: "order",
   };
   const obj = { a: 1, t: { b: { text: "hello" }, c: { text: "world" } } };
-  const result = applyByRule(obj, rule);
+  const result = applyByRule(obj, fromObject(rule));
   expect(result[0]).toEqual({
     a: 1,
     t: [
@@ -48,7 +48,7 @@ test("applyTo one wither order", () => {
 test("applyTo one with value holder", () => {
   const rule = { keyPropertyName: "name", applyTo: "$.t", valueHolder: defaultValueHolder };
   const obj = { a: 1, t: { b: "hello", c: "world" } };
-  const result = applyByRule(obj, rule);
+  const result = applyByRule(obj, fromObject(rule));
   expect(result[0]).toEqual({
     a: 1,
     t: [
@@ -65,7 +65,7 @@ test("applyTo one with value holder and index", () => {
     valueHolder: defaultValueHolder,
   };
   const obj = { a: 1, t: { b: "hello", c: "world" } };
-  const result = applyByRule(obj, rule);
+  const result = applyByRule(obj, fromObject(rule));
   expect(result[0]).toEqual({
     a: 1,
     t: [
@@ -84,7 +84,7 @@ test("applyTo deep", () => {
     a: 1,
     foo: { t: { b: { text: "hello" }, c: { text: "world" } } },
   };
-  const result = applyByRule(obj, rule);
+  const result = applyByRule(obj, fromObject(rule));
   expect(result[0]).toEqual({
     a: 1,
     foo: {
@@ -101,7 +101,7 @@ test("applyTo deep with value holder", () => {
     a: 1,
     foo: [{ t: { b: "hello", c: "world" } }],
   };
-  const result = applyByRule(obj, rule);
+  const result = applyByRule(obj, fromObject(rule));
   expect(result[0]).toEqual({
     a: 1,
     foo: [
@@ -124,7 +124,7 @@ test("not applied, not a map", () => {
     a: 1,
     t: [1, 2],
   };
-  const result = applyByRule(obj, rule);
+  const result = applyByRule(obj, fromObject(rule));
   expect(result[0]).toEqual(obj);
   expect(result[1]).toEqual(
     expect.arrayContaining([
@@ -132,3 +132,7 @@ test("not applied, not a map", () => {
     ])
   );
 });
+
+function fromObject(obj: any) :MapToArrayRule{
+  return new MapToArrayRule(obj.applyTo, obj.keyPropertyName, obj.indexPropertyName, obj.valueHolder);
+}

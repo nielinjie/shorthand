@@ -86,6 +86,5 @@ functions：
             base = functions.foo
             relative = io
             change relative to parameter+io
-            finally =base + changedRelative = functions.foo.parameter.io
-            base 和 applyTo可以是一个东西么？
-*/
+            finally =base + changedRelative = functions.foo.parameter.io */
+            // TODO base 和 applyTo可以是一个东西么？

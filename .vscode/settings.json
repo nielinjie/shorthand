@@ -18,5 +18,6 @@
         "statusBarItem.remoteBackground": "#f8a8e9",
         "statusBarItem.remoteForeground": "#15202b"
     },
-    "peacock.color": "#f8a8e9"
+    "peacock.color": "#f8a8e9",
+    "cmake.configureOnOpen": false
 }

@@ -1,5 +1,6 @@
 import { JSONPath } from "jsonpath-plus";
 import jsonp from "jsonpath";
+import _ from "lodash";
 const jp = {
   paths: (obj: any, path: string) => {
     return JSONPath({ path, json: obj, resultType: "path" }).map(
@@ -13,5 +14,6 @@ const jp = {
   stringify: (path: string[]): string => {
     return jsonp.stringify(path);
   },
+  
 };
 export default jp;
