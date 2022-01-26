@@ -25,3 +25,6 @@ export function removeHoldNilValue(
   });
   return obj;
 }
+
+export const jsonPath = jp
+export * as objectPath from './objectPath'

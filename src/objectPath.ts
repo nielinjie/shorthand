@@ -1,10 +1,9 @@
-import { number } from "joi";
 import _ from "lodash";
 
 export let pathSplit = ".";
 export let pathRootName = "$";
 export const parentName = "^";
-
+export {default as jsonPath} from './jsonPath'
 export function toLodashPath(jsonPath: string[]): string {
   if (_.head(jsonPath) === pathRootName)
     return _.tail(jsonPath).join(pathSplit);
